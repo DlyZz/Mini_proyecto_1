@@ -1,0 +1,10 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+- file: eda_lending_club_final (2)
+- file: pyspark_lending_club (1)
+- file: sklearn_lending_club (1)
+- file: lime_comparacion
