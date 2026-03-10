@@ -182,6 +182,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Interpretabilidad con LIME  &amp;  Comparación de Resultados</a></li>
 
+
 </ul>
 
     </div>
@@ -383,10 +384,12 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configurar-limetabularexplainer">Configurar LimeTabularExplainer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicacion-falso-negativo-fn">Explicación — Falso Negativo (FN)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicacion-falso-positivo-fp">Explicación — Falso Positivo (FP)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-visual-fn-vs-fp">Comparación visual FN vs FP</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretacion-de-resultados-lime">Interpretación de resultados LIME</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-visual-fn-vs-fp">Comparación visual FN vs FP</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#explicaciones-lime-instancias-mal-clasificadas">Explicaciones LIME — Instancias Mal Clasificadas</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falso-negativo-real-default-pred-fully-paid">Falso Negativo (real = Default · pred = Fully Paid)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falso-positivo-real-fully-paid-pred-default">Falso Positivo (real = Fully Paid · pred = Default)</a></li>
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-de-resultados-sklearn-vs-pyspark">Comparación de Resultados: sklearn vs PySpark</a><ul class="visible nav section-nav flex-column">
@@ -761,29 +764,80 @@ purpose_renewable_energy &lt;= 0.00              -0.0121  ↓ baja default
 <img alt="_images/3d2be811fc56a9255b8f93ebd71582b0484cae8761a1eb1a900e8ac37ad6dd15.png" src="_images/3d2be811fc56a9255b8f93ebd71582b0484cae8761a1eb1a900e8ac37ad6dd15.png" />
 </div>
 </div>
-<section id="interpretacion-de-resultados-lime">
-<h3>Interpretación de resultados LIME<a class="headerlink" href="#interpretacion-de-resultados-lime" title="Permalink to this heading">#</a></h3>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="explicaciones-lime-instancias-mal-clasificadas">
+<h1>Explicaciones LIME — Instancias Mal Clasificadas<a class="headerlink" href="#explicaciones-lime-instancias-mal-clasificadas" title="Permalink to this heading">#</a></h1>
+<section id="falso-negativo-real-default-pred-fully-paid">
+<h2>Falso Negativo (real = Default · pred = Fully Paid)<a class="headerlink" href="#falso-negativo-real-default-pred-fully-paid" title="Permalink to this heading">#</a></h2>
+<p>El modelo no detectó el default porque variables como la tasa de interés baja y el monto reducido del préstamo generaron una señal predominante de buen pagador, opacando las pocas alertas de riesgo presentes.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head"><p>Error</p></th>
-<th class="head"><p>Causa probable</p></th>
-<th class="head"><p>Impacto</p></th>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Contribución</p></th>
+<th class="head"><p>Efecto</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Falso Negativo</strong></p></td>
-<td><p>Variables financieras “buenas” (FICO alto, int_rate bajo) enmascararon señales de riesgo</p></td>
-<td><p>El banco pierde el capital prestado</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sub_grade</span> <span class="pre">&lt;=</span> <span class="pre">6.00</span></code></p></td>
+<td><p>−0.110</p></td>
+<td><p>Redujo la alarma de default</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Falso Positivo</strong></p></td>
-<td><p>Señales de riesgo aisladas (dti alto, annual_inc bajo) sobreactivaron la alarma</p></td>
-<td><p>Un cliente solvente es rechazado injustamente</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int_rate</span> <span class="pre">&lt;=</span> <span class="pre">−0.73</span></code></p></td>
+<td><p>−0.095</p></td>
+<td><p>Tasa baja interpretada como bajo riesgo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">term</span> <span class="pre">&lt;=</span> <span class="pre">0.00</span></code></p></td>
+<td><p>−0.049</p></td>
+<td><p>Plazo corto favoreció predicción de pago</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fico_range_high</span> <span class="pre">&lt;=</span> <span class="pre">−0.82</span></code></p></td>
+<td><p>+0.032</p></td>
+<td><p>Única señal real de riesgo detectada</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mort_acc</span></code> (rango medio)</p></td>
+<td><p>+0.026</p></td>
+<td><p>Leve alerta de incumplimiento</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>LIME es especialmente valioso en finanzas porque regulaciones como <strong>GDPR</strong> y <strong>Fair Credit Reporting Act</strong> obligan a las instituciones a explicar individualmente cada decisión de crédito.</p>
 </section>
+<hr class="docutils" />
+<section id="falso-positivo-real-fully-paid-pred-default">
+<h2>Falso Positivo (real = Fully Paid · pred = Default)<a class="headerlink" href="#falso-positivo-real-fully-paid-pred-default" title="Permalink to this heading">#</a></h2>
+<p>El modelo sobreestimó el riesgo al reaccionar ante indicadores estructurales de alto riesgo —subgrado elevado, tasa alta, plazo largo— que en esta instancia particular no derivaron en incumplimiento.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Contribución</p></th>
+<th class="head"><p>Efecto</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sub_grade</span> <span class="pre">&gt;</span> <span class="pre">14.00</span></code></p></td>
+<td><p>+0.099</p></td>
+<td><p>Principal detonante de la predicción de default</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">int_rate</span> <span class="pre">&gt;</span> <span class="pre">0.58</span></code></p></td>
+<td><p>+0.086</p></td>
+<td><p>Tasa alta interpretada como alto riesgo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">term</span> <span class="pre">&gt;</span> <span class="pre">0.00</span></code></p></td>
+<td><p>+0.047</p></td>
+<td><p>Plazo largo reforzó la alarma</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">annual_inc</span> <span class="pre">&lt;=</span> <span class="pre">−0.52</span></code></p></td>
+<td><p>+0.027</p></td>
+<td><p>Ingresos bajos sumaron al perfil de riesgo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">purpose_house</span> <span class="pre">&lt;=</span> <span class="pre">0.00</span></code></p></td>
+<td><p>−0.032</p></td>
+<td><p>Intentó compensar la señal de riesgo</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 <hr class="docutils" />
@@ -1172,10 +1226,12 @@ a pandas dentro del notebook de Spark y calcular roc_curve allí.
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configurar-limetabularexplainer">Configurar LimeTabularExplainer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicacion-falso-negativo-fn">Explicación — Falso Negativo (FN)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicacion-falso-positivo-fp">Explicación — Falso Positivo (FP)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-visual-fn-vs-fp">Comparación visual FN vs FP</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretacion-de-resultados-lime">Interpretación de resultados LIME</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-visual-fn-vs-fp">Comparación visual FN vs FP</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#explicaciones-lime-instancias-mal-clasificadas">Explicaciones LIME — Instancias Mal Clasificadas</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falso-negativo-real-default-pred-fully-paid">Falso Negativo (real = Default · pred = Fully Paid)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falso-positivo-real-fully-paid-pred-default">Falso Positivo (real = Fully Paid · pred = Default)</a></li>
 </ul>
 </li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#comparacion-de-resultados-sklearn-vs-pyspark">Comparación de Resultados: sklearn vs PySpark</a><ul class="visible nav section-nav flex-column">
